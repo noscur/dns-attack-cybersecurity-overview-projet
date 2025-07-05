@@ -1,0 +1,22 @@
+$TTL 60
+@   IN  SOA ns.project.local. contact.project.local. (
+                2024092801  ; Serial
+                3600        ; Refresh
+                1800        ; Retry
+                1209600     ; Expire
+                60          ; Minimum TTL
+                )
+
+; the DNS server responsible for the zone project.local
+@                         IN  NS      ns.project.local. 
+
+; DNS server
+ns                        IN  A       172.23.0.53 
+
+; routers
+r1                        IN  A       172.23.0.1
+r2                        IN  A       172.23.0.2
+
+; reverse proxy (nginx)
+@                         IN  A       172.23.0.3
+rp                        IN  CNAME   project.local.

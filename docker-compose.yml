@@ -1,0 +1,52 @@
+services:
+  dns-server-main:
+    image: ubuntu/bind9
+    volumes:
+      - './bind-volumes/named.conf:/etc/bind/named.conf:ro'
+      - './bind-volumes/records:/var/lib/bind:ro'
+    networks:
+      cyberproject-network:
+        ipv4_address: 172.23.0.53
+    environment:
+      - BIND9_USER=root
+      - TZ=Europe/Paris
+    ports:
+      - '5053:53/udp'
+    restart: always
+  reverse-proxy:
+    image: nginx
+    ports:
+      - '80:80'
+    networks:
+      cyberproject-network:
+        ipv4_address: 172.23.0.3
+    restart: always
+  dnstunnelingattack:
+    build: ./dns-tunneling-attack/server
+    restart: always
+    networks:
+      cyberproject-network:
+        ipv4_address: 172.23.0.23
+    ports:
+      - '3000:3000'
+  amplification-server:
+    build: ./DNS_amplification_attack
+    restart: always
+    networks:
+      cyberproject-network:
+        ipv4_address: 172.23.0.122
+    ports:
+      - '3002:3002'
+  botnet:
+    build: ./DNS_amplification_attack/botnet
+    restart: always
+    deploy:
+      replicas: 40
+    depends_on:
+      - amplification-server
+    networks:
+      - cyberproject-network 
+
+networks:
+  cyberproject-network:
+    external: true
